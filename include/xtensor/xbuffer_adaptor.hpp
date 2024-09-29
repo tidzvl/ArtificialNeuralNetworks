@@ -16,7 +16,7 @@
 #include <memory>
 #include <stdexcept>
 
-#include <F:\DSA2\dsastudents\dsastudents\include\xtl\xclosure.hpp>
+#include <xtl/xclosure.hpp>
 
 #include "xstorage.hpp"
 #include "xtensor_config.hpp"
