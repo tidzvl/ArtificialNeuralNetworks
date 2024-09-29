@@ -340,9 +340,9 @@ template <class T>
 void XArrayList<T>::clear()
 {
     // TODO
-    // for(int i = 0; i < this->count; i++){
-    // }
-    deleteUserData(this);
+    if(this->count == 0) return;
+    // deleteUserData(this);
+    delete[] this->data;
     this->count = 0;
     this->capacity = 10;
     this->data = new T[10];

@@ -145,4 +145,20 @@ void demoRemoveAt(){
     list1.println();
 }
 
+void demoClear(){
+    XArrayList<int> list;
+    list.clear();
+    list.add(0);
+    list.add(1);
+    list.add(2);
+    list.add(1);
+    list.clear();
+    list.add(2);
+    list.add(1);
+    list.clear();
+    string output = list.toString() + ";size=" + to_string(list.size()) +
+                  ";empty=" + to_string(list.empty());
+    cout << output << endl;
+}
+
 #endif /* XARRAYLISTDEMO_H */
