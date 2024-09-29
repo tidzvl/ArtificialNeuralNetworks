@@ -16,15 +16,15 @@
 #include <sstream>
 using namespace std;
 
-#include "F:\DSA2\dsastudents\dsastudents\include\xtensor\xtensor.hpp"
-#include "F:\DSA2\dsastudents\dsastudents\include\xtensor\xview.hpp"
-#include "F:\DSA2\dsastudents\dsastudents\include\xtensor\xslice.hpp"
-#include "F:\DSA2\dsastudents\dsastudents\include\xtensor\xbuilder.hpp"
-#include "F:\DSA2\dsastudents\dsastudents\include\xtensor-blas\xlinalg.hpp"
-#include "F:\DSA2\dsastudents\dsastudents\include\xtensor\xrandom.hpp"
-#include "F:\DSA2\dsastudents\dsastudents\include\xtensor\xindex_view.hpp"
-#include "F:\DSA2\dsastudents\dsastudents\include\xtensor\xsort.hpp"
-#include "F:\DSA2\dsastudents\dsastudents\include\xtensor\xarray.hpp"
+#include "xtensor/xio.hpp"
+#include "xtensor/xview.hpp"
+#include "xtensor/xslice.hpp"
+#include "xtensor/xbuilder.hpp"
+#include "xtensor-blas/xlinalg.hpp"
+#include "xtensor/xrandom.hpp"
+#include "xtensor/xindex_view.hpp"
+#include "xtensor/xsort.hpp"
+#include "xtensor/xarray.hpp"
 #include <ctime>
 
 typedef unsigned long ulong;
