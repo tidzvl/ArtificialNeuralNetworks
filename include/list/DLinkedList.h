@@ -245,7 +245,6 @@ DLinkedList<T>::DLinkedList(
     bool (*itemEqual)(T &, T &))
 {
     // TODO
-    T *data = new T();
     this->head = nullptr;
     this->tail = nullptr;
     this->count = 0;
@@ -285,14 +284,27 @@ template <class T>
 void DLinkedList<T>::add(T e)
 {
     // TODO
+    // Node* newNode = new Node(e);
+    // if(this->count == 0) {
+    //     this->head = newNode;
+    //     this->tail = newNode;
+    // }else{
+    //     this->tail->next = newNode;
+    //     newNode->prev = this->tail;
+    //     this->tail = newNode;
+    // }
+    // this->count++;
+
     Node* newNode = new Node(e);
-    if(this->count == 0) {
-        this->head = newNode;
-        this->tail = newNode;
+    if(head == nullptr) {
+        head = newNode;
     }else{
-        this->tail->next = newNode;
-        newNode->prev = this->tail;
-        this->tail = newNode;
+        Node* current = head;
+        while(current->next != nullptr) {
+            current = current->next;
+        }
+        current->next = newNode;
+        newNode->prev = current;
     }
     this->count++;
 }
@@ -399,12 +411,13 @@ int DLinkedList<T>::indexOf(T item)
     // TODO
     if(this->count == 0) return -1;
     Node *current = this->head;
-    if(current == nullptr) cout << "dcm" << endl;
-    for(int i = 0; current != nullptr; i++){
-        stringstream ss1, ss2;
-        ss1 << current->data;
-        ss2 << item;
-        if(ss1.str() == ss2.str()) return i;
+    for(int i = 0; current != tail; i++){
+        // cout << "in loop" << endl;
+        // stringstream ss1, ss2;
+        // ss1 << current->data;
+        // ss2 << item;
+        // if(ss1.str() == ss2.str()) return i;
+        if(equals(current->data, item, itemEqual)) return i;
         current = current->next;
     }
     return -1;
@@ -448,16 +461,18 @@ string DLinkedList<T>::toString(string (*item2str)(T &))
      * @return A string representation of the list with elements separated by commas and enclosed in square brackets.
      */
     // TODO
+
     string output = "[";
+    Node* current = this->head;
     for(size_t i = 0; i < this->count; i++){
-        if(item2str != nullptr) output += item2str(this->head->data);
+        if(item2str != nullptr) output += item2str(current->data);
         else{
             stringstream ss;
-            ss << this->head->data;
+            ss << current->data;
             output += ss.str();
         }
         if(i < this->count - 1) output += ", ";
-        this->head = this->head->next;
+        current = current->next;
     }
     output += "]";
     return output;
