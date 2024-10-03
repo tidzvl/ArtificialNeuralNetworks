@@ -119,5 +119,6 @@
     "typeindex": "cpp",
     "typeinfo": "cpp",
     "variant": "cpp"
-  }
+  },
+  "cmake.sourceDirectory": "F:/DSA2/dsastudents/ArtificialNeuralNetworks/include/xflens/cxxblas"
 }

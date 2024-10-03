@@ -46,41 +46,92 @@ public:
     /////////////////////////////////////////////////////////////////////////
 
     Iterator begin(){
-        return Iterator(this, 0);
+        return Iterator(*this, 0);
     }
 
     Iterator end(){
-        return Iterator(this, batch_size);
+        return Iterator(*this, ptr_dataset->len());
     }
     class Iterator{
+    private:
+        int index;
+        DataLoader<DType, LType>& loader;
+        int current_index;
+        bool end;
     public:
-        Iterator(DataLoader* loader, int index) : loader(loader), index(index) {}
+        Iterator(DataLoader<DType, LType>& loader, int index) : loader(loader), index(index), current_index(0), end(false) {}
+
         Iterator& operator=(const Iterator& r){
-            this->index = r.index;
+            if(this != &r){
+                loader = r.loader;
+                index = r.index;
+            }
             return *this;
         }
         
         Iterator& operator++(){
-            index++;
+            ++index;
             return *this;
         }
 
-        Iterator& operator++(int){
+        Iterator operator++(int){
             Iterator iterator = *this;
             ++*this;
             return iterator;
         }
 
-        bool operator!=(const Iterator& o){
-            return index != o.index;
+        bool operator!=(const Iterator& o) const{
+            return !end && index != o.index;
         }
 
-        Batch<DType, LType>& operator*() const{
-            return Batch<DType, LType>(xt::xarray<DType>{}, xt::xarray<LType>{});
+        Batch<DType, LType>& operator*() {
+            auto shape = loader.ptr_dataset->get_data_shape();
+            // cout << shape.data()[0] << endl;
+            int k = shape.data()[0];
+            int batch_cuoi = 0;
+            int co_du_khong = k%loader.batch_size;
+            if(co_du_khong != 0){
+                if(loader.drop_last == false){
+                    batch_cuoi = co_du_khong;
+                    batch_cuoi = loader.batch_size + co_du_khong;
+                }
+            }
+
+            auto data_shape1 = loader.ptr_dataset->get_data_shape();
+            cout << "asdasd : " << data_shape1.size() << endl;
+            // data_shape1[0] = loader.batch_size;
+            std::vector<size_t> data_shape2 = {static_cast<size_t>(loader.batch_size), static_cast<size_t>(data_shape1[1]), static_cast<size_t>(data_shape1[2])};
+            cout << "Datashape2: " << xt::adapt(data_shape2) << endl;
+            // cout << "Index: " << index << endl;
+            cout << "Current index: " << current_index << endl;
+
+            xt::xarray<DType> Batch_data = xt::zeros<DType>(data_shape2);
+
+
+            for(int i = current_index ; i < current_index + loader.batch_size; i++){
+                auto item = loader.ptr_dataset->getitem(i);
+                // if(data_shape1.size() == 1){
+                //     Batch_data(i - current_index) = item.getData()(0);
+                // }else{
+                //     xt::view(Batch_data, i - current_index, xt::all()) = item.getData();
+                // }
+            }
+            current_index += loader.batch_size;
+            if(current_index + loader.batch_size > k){
+                end = true;
+            }
+
+            // int end_index = min(index + loader.batch_size, loader.ptr_dataset->len());
+            // int batch_size_to_use = end_index - index;
+            // auto data_shape = loader.ptr_dataset->get_data_shape();
+            // std::vector<size_t> batch_data_shape = {static_cast<size_t>(batch_size_to_use)};
+            // xt::xarray<DType> Batch_data = xt::zeros<DType>(batch_data_shape);
+            xt::xarray<LType> Batch_label = xt::empty<LType>({static_cast<size_t>(loader.batch_size)});
+
+            static Batch<DType, LType> batch(Batch_data, Batch_label);
+            return batch;
         }
-    private:
-        int index;
-        DataLoader* loader;
+            
     };
 
 

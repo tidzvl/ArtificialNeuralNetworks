@@ -37,6 +37,8 @@ public:
     Batch(xt::xarray<DType> data,  xt::xarray<LType> label):
     data(data), label(label){
     }
+    Batch(const Batch&) = default;
+    Batch(Batch&&) = default;
     virtual ~Batch(){}
     xt::xarray<DType>& getData(){return data; }
     xt::xarray<LType>& getLabel(){return label; }
@@ -80,6 +82,8 @@ public:
         this->label_shape = xt::svector<long unsigned int>(label.shape().size());
         for (size_t i = 0; i < data.shape().size(); ++i) {
             this->data_shape[i] = data.shape()[i];
+        }
+        for (size_t i = 0; i < label.shape().size(); ++i) {
             this->label_shape[i] = label.shape()[i];
         }
     }
@@ -98,14 +102,36 @@ public:
     DataLabel<DType, LType> getitem(int index){
         /* TODO: your code is here
          */
-        if(index < 0 || index >= data.shape(0)) throw std::out_of_range("index out of range");
-        xt::xarray<DType> data_item = xt::xarray<DType>::from_shape({data.shape(1)});
-        xt::xarray<LType> label_item = xt::xarray<LType>::from_shape({label.shape(1)});
-        for(int i = 0; i < data.shape(1); i++){
-            data_item(i) = data(index, i);
+        auto shapeD = data.shape();
+        auto shapeL = label.shape();
+        xt::xarray<DType> data_item = xt::xarray<DType>::from_shape(shapeD);
+        xt::xarray<LType> label_item = xt::xarray<LType>::from_shape(shapeL);
+        if(data.shape().size() == 1 || data.shape().size() == 0){
+            if(index < 0 || index >= data.shape(0)) {
+                data_item = data(0);
+            }
+            else {
+                data_item = data(index);
+            }
+        }else{
+            data_item = xt::xarray<DType>::from_shape({data.shape(1)});
+            for(int i = 0; i < data.shape(1); i++){
+                data_item(i) = data(index, i);
+            }
         }
-        if(label.shape().size() == 1) label_item = label(index);
-        else{
+        if(label.shape().size() == 1 || label.shape().size() == 0){
+            if(index < 0 || index >= label.shape(0)) {
+                label_item = label(0);
+                DataLabel<DType, LType> item(data_item, label_item);
+                return item;
+            }
+            else {
+                label_item = label(index);
+                DataLabel<DType, LType> item(data_item, label_item);
+                return item;
+            }
+        }else{
+            label_item = xt::xarray<LType>::from_shape({label.shape(1)});
             for(int i = 0; i < label.shape(1); i++){
                 label_item(i) = label(index, i);
             }
