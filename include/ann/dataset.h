@@ -37,8 +37,8 @@ public:
     Batch(xt::xarray<DType> data,  xt::xarray<LType> label):
     data(data), label(label){
     }
-    Batch(const Batch&) = default;
-    Batch(Batch&&) = default;
+    // Batch(const Batch&) = default;
+    // Batch(Batch&&) = default;
     virtual ~Batch(){}
     xt::xarray<DType>& getData(){return data; }
     xt::xarray<LType>& getLabel(){return label; }
@@ -56,7 +56,6 @@ public:
     virtual DataLabel<DType, LType> getitem(int index)=0;
     virtual xt::svector<unsigned long> get_data_shape()=0;
     virtual xt::svector<unsigned long> get_label_shape()=0;
-    
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -104,6 +103,9 @@ public:
          */
         auto shapeD = data.shape();
         auto shapeL = label.shape();
+        size_t ds = data.shape(0);
+        size_t ls = label.shape(0);
+        if(index < 0 || (index >= data.shape(0) && ds != 0) || (index >= label.shape(0) && ls != 0)) throw std::out_of_range("Index is out of range!");
         xt::xarray<DType> data_item = xt::xarray<DType>::from_shape(shapeD);
         xt::xarray<LType> label_item = xt::xarray<LType>::from_shape(shapeL);
         if(data.shape().size() == 1 || data.shape().size() == 0){
@@ -114,10 +116,16 @@ public:
                 data_item = data(index);
             }
         }else{
-            data_item = xt::xarray<DType>::from_shape({data.shape(1)});
-            for(int i = 0; i < data.shape(1); i++){
-                data_item(i) = data(index, i);
-            }
+            //data.shape(1) = 10
+            //data.shape(2) = 5
+            // cout << data.shape().size() << endl;
+            // data_item = xt::xarray<DType>::from_shape({data.shape(1)});
+            // for(int i = 0; i < data.shape(1); i++){
+            //     data_item(i) = data(index, i);
+            // }
+            auto data_view = xt::view(data, index, xt::all(), xt::all());
+            data_item = xt::xarray<DType>::from_shape(data_view.shape());
+            data_item = data_view;
         }
         if(label.shape().size() == 1 || label.shape().size() == 0){
             if(index < 0 || index >= label.shape(0)) {
@@ -126,6 +134,7 @@ public:
                 return item;
             }
             else {
+                // cout << "in here: " << label(10) << endl;
                 label_item = label(index);
                 DataLabel<DType, LType> item(data_item, label_item);
                 return item;
@@ -135,6 +144,9 @@ public:
             for(int i = 0; i < label.shape(1); i++){
                 label_item(i) = label(index, i);
             }
+            // auto label_view = xt::view(data, index, xt::all(), xt::all());
+            // label_item = xt::xarray<LType>::from_shape(label_view.shape());
+            // label_item = label_view;
         }
         DataLabel<DType, LType> item(data_item, label_item);
         return item;

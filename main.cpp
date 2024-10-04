@@ -53,7 +53,7 @@ int main(int argc, char const *argv[])
 
 
 
-    //test dataloader
+    // test dataloader
     // int nsamples = 100;
     // xt::xarray<double> X = xt::random::randn<double>({nsamples, 10});
     // xt::xarray<double> T = xt::random::randn<double>({nsamples, 5});
@@ -64,42 +64,123 @@ int main(int argc, char const *argv[])
     //     cout << shape2str(batch.getLabel().shape()) << endl;
     // }
 
-    string name = "data20";
-    //! data
-    int nsamples = 120;
-    xt::xarray<double> X = xt::random::randn<double>({nsamples, 10, 5});
-    xt::xarray<double> T = xt::random::randn<double>({nsamples, 5, 5});
-    TensorDataset<double, double> ds(X, T);
-    DataLoader<double, double> loader(&ds, 30, true, true);
-    //! expect
-    string expect =
-        "(30, 10, 5);(30, 5, 5) (30, 10, 5);(30, 5, 5) (30, 10, 5);(30, 5, 5) "
-        "(30, 10, 5);(30, 5, 5) ";
+    // string name = "data20";
+    // //! data
+    // int nsamples = 120;
+    // xt::xarray<double> X = xt::random::randn<double>({nsamples, 10, 5});
+    // xt::xarray<double> T = xt::random::randn<double>({nsamples, 5, 5});
+    // TensorDataset<double, double> ds(X, T);
+    // DataLoader<double, double> loader(&ds, 30, true, true);
+    // //! expect
+    // string expect =
+    //     "(30, 10, 5);(30, 5, 5) (30, 10, 5);(30, 5, 5) (30, 10, 5);(30, 5, 5) "
+    //     "(30, 10, 5);(30, 5, 5) ";
 
-    //! output
+    // ! output
 
-    stringstream output;
-    xt::svector<unsigned long>a;
-    for (auto batch : loader) {
-        // output << shape2str(xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end())) << ";";
-        // output << shape2str(xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end())) << " ";
-        // cout << xt::adapt(batch.getData().shape()) << ";";
-        a = xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end());
-        for(int idx=0; idx < a.size(); idx++){
-            cout << a[idx] << ", ";
-        }
-        cout << endl;
-    }
+    // stringstream output;
+    // xt::svector<unsigned long>a;
+    // xt::svector<unsigned long>b;
+    // for (auto batch : loader) {
+    //     // output << shape2str(xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end())) << ";";
+    //     // output << shape2str(xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end())) << " ";
+    //     // cout << xt::adapt(batch.getData().shape()) << ";";
+    //     a = xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end());
+    //     cout << "(";
+    //     for(int idx=0; idx < a.size(); idx++){
+    //         cout << a[idx];
+    //         if(idx != a.size() - 1) cout << ", ";
+    //     }
+    //     cout << ");";
+    //     b = xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end());
+    //     cout << "(";
+    //     for(int idx=0; idx < b.size(); idx++){
+    //         cout << b[idx];
+    //         if(idx != b.size() - 1) cout << ", ";
+    //     }
+    //     cout << ") ";
+    // }
+
+    string name = "data26";
+  //! data
+  xt::xarray<float> data = {1., 2., 3.};
+  xt::xarray<string> label;
+ 
+  TensorDataset<float, string> tensor(data, label);
+  
+  DataLabel<float, string> getitem = tensor.getitem(0);
+
+  xt::xarray<float> getData = getitem.getData();
+  xt::xarray<string> getLabel = getitem.getLabel();
+
+  //! expect
+  string expect = " 1.;";
+
+  //! output
+  stringstream output;
+  output << getData << ";";
+  output << getLabel;
+
+  //! output
+
+    // stringstream output;
+    // xt::svector<unsigned long>a;
+    // xt::svector<unsigned long>b;
+    // for (auto batch : loader) {
+    //     // output << shape2str(xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end())) << ";";
+    //     // output << shape2str(xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end())) << " ";
+    //     a = xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end());
+    //     output << "(";
+    //     for(int idx=0; idx < a.size(); idx++){
+    //         output << a[idx];
+    //         if(idx != a.size() - 1) output << ", ";
+    //     }
+    //     output << ");";
+    //     b = xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end());
+    //     output << "(";
+    //     for(int idx=0; idx < b.size(); idx++){
+    //         output << b[idx];
+    //         if(idx != b.size() - 1) output << ", ";
+    //     }
+    //     output << ") ";
+    // }
+    // auto batch = loader.begin();
+    // Batch<double, double> c = *(batch);
+    // stringstream output;
+    // xt::svector<unsigned long>a;
+    // xt::svector<unsigned long>b;
+    // for (auto batch : loader) {
+    //     // output << shape2str(xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end())) << ";";
+    //     // output << shape2str(xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end())) << " ";
+    //     a = xt::svector<unsigned long>(c.getData().shape().begin(), c.getData().shape().end());
+    //     output << "(";
+    //     for(int idx=0; idx < a.size(); idx++){
+    //         output << a[idx];
+    //         if(idx != a.size() - 1) output << ", ";
+    //     }
+    //     output << ") ";
+    //     b = xt::svector<unsigned long>(c.getLabel().shape().begin(), c.getLabel().shape().end());
+    //     output << "(";
+    //     for(int idx=0; idx < b.size(); idx++){
+    //         output << b[idx];
+    //         if(idx != b.size() - 1) output << ", ";
+    //     }
+    //     output << ")";
+    // }
+
+
+
+
     // //! remove data
 
     //! print result
-    // cout << "name=" << name << endl;
-    // cout << "expect=" << expect << endl;
-    // cout << "output=" << output.str() << endl;
-    // if(expect == output.str())
-    //     cout << "pass" << endl;
-    // else
-    //     cout << "fail" << endl;
+    cout << "name=" << name << endl;
+    cout << "expect=" << expect << endl;
+    cout << "output=" << output.str() << endl;
+    if(expect == output.str())
+        cout << "pass" << endl;
+    else
+        cout << "fail" << endl;
 
     return 0;
 }
