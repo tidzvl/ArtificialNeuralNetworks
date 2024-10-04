@@ -63,6 +63,7 @@ public:
     }
     Iterator end()
     {
+    		if(capacity == 0) return Iterator(this, 1);
         return Iterator(this, count);
     }
 
@@ -188,7 +189,9 @@ XArrayList<T>::XArrayList(
     this->itemEqual = itemEqual;
     this->count = 0;
     this->capacity = capacity;
-    this->data = new T[capacity];
+    //if(capacity == 0) this->capacity = 10;
+    if(capacity == 0) this->data = new T[1];
+    else this->data = new T[capacity];
 }
 
 template <class T>
@@ -221,7 +224,7 @@ XArrayList<T>::XArrayList(const XArrayList<T> &list)
     for(int i = 0; i < this->count; i++){
         newData[i] = this->data[i];
     }
-    delete[] this->data;
+    // delete[] this->data;
     this->data = newData;
     this->deleteUserData = list.deleteUserData;
     this->itemEqual = list.itemEqual;
@@ -248,8 +251,8 @@ template <class T>
 XArrayList<T>::~XArrayList()
 {
     // TODO
-    delete[] this->data;
     if(deleteUserData != 0) deleteUserData(this);
+    delete[] this->data;
 }
 
 template <class T>
@@ -261,19 +264,21 @@ template <class T>
 void XArrayList<T>::add(T e)
 {
     // TODO
-    if(count == capacity) { //full stack
+    if(count == capacity && capacity != 0) { //full stack
         T *newData = new T[capacity*2];
         for(int i = 0; i < this->count; i++){
             newData[i] = this->data[i];
         }
         delete[] this->data;
         this->data = newData;
-        // this->capacity *= 2;
+        this->capacity *= 2;
     }
-    if(this->count == 0) {
+    if(this->count == 0 || capacity == 0) {
         this->data[0] = e;
     }
-    else this->data[this->count] = e;
+    else {
+		this->data[this->count] = e;
+	}
     this->count++;
 }
 
@@ -283,7 +288,7 @@ void XArrayList<T>::add(int index, T e)
     // TODO
     if(index < 0 || index > this->count) throw std::out_of_range("Index is out of range!");
 
-    if(count == capacity) { //full stack
+    if(count == capacity && capacity != 0) { //full stack
         T *newData = new T[capacity*2];
         for(int i = 0; i < this->count; i++){
             newData[i] = this->data[i];
@@ -293,7 +298,7 @@ void XArrayList<T>::add(int index, T e)
         this->capacity *= 2;
     }
 
-    if(this->count == 0) this->data[0] = e;
+    if(this->count == 0 || capacity == 0) this->data[0] = e;
     else {
         for(int i = this->count; i > index; i--) this->data[i] = this->data[i-1];
         this->data[index] = e;
@@ -320,8 +325,8 @@ bool XArrayList<T>::removeItem(T item, void (*removeItemData)(T))
     if(this->count == 0) return false;
     int index = this->indexOf(item);
     if(index == -1) return false;
-    this->removeAt(index);
-    if(removeItemData != 0) removeItemData(item);
+    T item2 = this->removeAt(index);
+    if(removeItemData != 0) removeItemData(item2);
     return true;    
 }
 
@@ -365,7 +370,7 @@ int XArrayList<T>::indexOf(T item)
 {
     // TODO
     for(int i = 0; i < this->count; i++){
-        if(this->data[i] == item) return i;
+        if(equals(this->data[i], item, itemEqual)) return i;
     }
     return -1;
 }
@@ -375,7 +380,8 @@ bool XArrayList<T>::contains(T item)
     // TODO
     if(empty()) return false;
     for(int i = 0; i < this->count; i++){
-        if(this->data[i] == item) return true;
+        // if(this->data[i] == item) return true;
+        if(equals(this->data[i], item, itemEqual)) return true;
     }
     return false;
 }

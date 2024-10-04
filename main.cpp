@@ -20,20 +20,34 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
 
-    string name = "array29";
+    string name = "array35";
     //! data
-    XArrayList<Point> list(0, &Point::pointEQ_X);
-    list.add(Point(3.f, 4.f));
-    list.add(Point(4.f, 3.f));
+    XArrayList<Point *> list(&XArrayList<Point *>::free, &Point::pointEQ, 0);
+    list.add(new Point(23.2f, 25.4f));
+    list.add(new Point(24.6f, 23.1f));
+    list.add(new Point(12.5f, 22.3f));
+    list.add(new Point(23.2f, 25.4f));
+    list.add(new Point(24.6f, 23.1f));
+    list.add(new Point(12.5f, 22.3f));
+    list.add(new Point(23.2f, 25.4f));
+    list.add(new Point(24.6f, 23.1f));
+    list.add(new Point(12.5f, 22.3f));
+    list.add(new Point(23.2f, 25.4f));
+    list.add(new Point(24.6f, 23.1f));
+    list.add(new Point(12.5f, 22.3f));
 
     //! expect
-    string expect = "Contains item 1: true";
+    string expect = "[P(12.5, 22.3, 0.0)]";
 
     //! output
-    bool contains = list.contains(Point(3.f, 5.f));
-    string output = "Contains item 1: " + string(contains ? "true" : "false");
+    stringstream output;
+    output << "[";
+    for (auto it : list) {
+        output << *it << ", ";
+    }
+    output << "]";
     cout << expect << endl;
-    cout << output << endl;
+    cout << output.str() << endl;
     // //! expect
     // string expect = "[0]\nsize=1\nempty=0";
 
