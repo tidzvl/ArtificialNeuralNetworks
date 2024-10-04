@@ -114,6 +114,8 @@ public:
             std::cout << item; //print the item
      }
      */
+
+
     BWDIterator bbegin()
     {
         return BWDIterator(this, true);
@@ -227,7 +229,66 @@ public:
             ++*this;
             return iterator;
         }
+
+        
     };
+
+    class BWDIterator {
+    public:
+        BWDIterator(DLinkedList<T>* pList, bool begin) {
+            this->pList = pList;
+            if (begin) {
+                currentNode = pList->tail->prev; 
+            } else {
+                currentNode = pList->head; 
+            }
+        }
+
+        BWDIterator& operator=(const BWDIterator& iterator) {
+            currentNode = iterator.currentNode;
+            pList = iterator.pList;
+            return *this;
+        }
+
+        T& operator*() {
+            return currentNode->data;
+        }
+
+        bool operator!=(const BWDIterator& iterator) {
+            return currentNode != iterator.currentNode;
+        }
+
+        BWDIterator& operator--() {
+            if (currentNode != pList->head) {
+                currentNode = currentNode->prev;
+            }
+            return *this;
+        }
+
+        BWDIterator operator--(int) {
+            BWDIterator temp = *this;
+            --(*this);
+            return temp;
+        }
+
+        void remove(void (*removeItemData)(T) = 0) {
+            currentNode->prev->next = currentNode->next;
+            currentNode->next->prev = currentNode->prev;
+            Node* pNext = currentNode->prev; 
+            if (removeItemData != 0) {
+                removeItemData(currentNode->data);
+            }
+            delete currentNode;
+            currentNode = pNext;
+            pList->count -= 1;
+        }
+
+    private:
+        Node* currentNode;
+        DLinkedList<T>* pList;
+    };
+
+
 };
 //////////////////////////////////////////////////////////////////////
 // Define a shorter name for DLinkedList:
@@ -272,12 +333,33 @@ template <class T>
 DLinkedList<T> &DLinkedList<T>::operator=(const DLinkedList<T> &list)
 {
     // TODO
+    if (this != &list) {
+        while (head) {
+            Node* temp = head;
+            head = head->next;
+            delete temp;
+        }
+
+        head = nullptr;
+        tail = nullptr;
+        Node* current = list.head;
+        while (current) {
+            push_back(current->data);
+            current = current->next;
+        }
+    }
+    return *this;
 }
 
 template <class T>
 DLinkedList<T>::~DLinkedList()
 {
     // TODO
+    while (head) {
+        Node* temp = head;
+        head = head->next;
+        delete temp;
+    }
 }
 
 template <class T>
@@ -347,6 +429,20 @@ typename DLinkedList<T>::Node *DLinkedList<T>::getPreviousNodeOf(int index)
      * Efficiently navigates to the node by choosing the shorter path based on the index's position.
      */
     // TODO
+    if(index < 0 || index >= this->count) throw std::out_of_range("Index out of range");
+    if(index < this->count / 2) {
+        Node* current = this->head;
+        for(int i = 0; i < index; i++){
+            current = current->next;
+        }
+        return current;
+    }else{
+        Node* current = this->tail;
+        for(int i = this->count - 1; i > index; i--){
+            current = current->prev;
+        }
+        return current;
+    }
 
 }
 

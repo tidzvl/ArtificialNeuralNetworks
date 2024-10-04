@@ -3,12 +3,13 @@
 #include <sstream>
 #include <string>
 #include "include/list/listheader.h"
-#include "include/list/XArrayListDemo.h"
+// #include "include/list/XArrayListDemo.h"
 // #include "include/list/DLinkedListDemo.h"
-#include "include/ann/dataset.h"
-#include "include/ann/dataloader.h"
+// #include "include/ann/dataset.h"
+// #include "include/ann/dataloader.h"
 // #include "include/ann/funtions.h"
 // #include "include/ann/xtensor_lib.h"
+#include "include/util/Point.h"
 
 
 
@@ -18,6 +19,33 @@ using namespace std;
 
 int main(int argc, char const *argv[])
 {
+
+    string name = "array29";
+    //! data
+    XArrayList<Point> list(0, &Point::pointEQ_X);
+    list.add(Point(3.f, 4.f));
+    list.add(Point(4.f, 3.f));
+
+    //! expect
+    string expect = "Contains item 1: true";
+
+    //! output
+    bool contains = list.contains(Point(3.f, 5.f));
+    string output = "Contains item 1: " + string(contains ? "true" : "false");
+    cout << expect << endl;
+    cout << output << endl;
+    // //! expect
+    // string expect = "[0]\nsize=1\nempty=0";
+
+    // //! output
+    // string output = list.toString() + "\nsize=" + to_string(list.size()) +
+    //                 "\nempty=" + to_string(list.empty());
+    
+    // cout << expect << endl;
+    // cout << output << endl;
+    // DLinkedList<string>::Iterator it = list.bbegin();
+    // --it;
+
     // xt::xarray<float> data = {{1., 2.}, {3., 4.}, {5., 6.}};
     // xt::xarray<string> label = {"one", "two", "three"};
 
@@ -101,25 +129,25 @@ int main(int argc, char const *argv[])
     //     cout << ") ";
     // }
 
-    string name = "data26";
-  //! data
-  xt::xarray<float> data = {1., 2., 3.};
-  xt::xarray<string> label;
+//     string name = "data26";
+//   //! data
+//   xt::xarray<float> data = {1., 2., 3.};
+//   xt::xarray<string> label;
  
-  TensorDataset<float, string> tensor(data, label);
+//   TensorDataset<float, string> tensor(data, label);
   
-  DataLabel<float, string> getitem = tensor.getitem(0);
+//   DataLabel<float, string> getitem = tensor.getitem(0);
 
-  xt::xarray<float> getData = getitem.getData();
-  xt::xarray<string> getLabel = getitem.getLabel();
+//   xt::xarray<float> getData = getitem.getData();
+//   xt::xarray<string> getLabel = getitem.getLabel();
 
-  //! expect
-  string expect = " 1.;";
+//   //! expect
+//   string expect = " 1.;";
 
-  //! output
-  stringstream output;
-  output << getData << ";";
-  output << getLabel;
+//   //! output
+//   stringstream output;
+//   output << getData << ";";
+//   output << getLabel;
 
   //! output
 
@@ -174,13 +202,13 @@ int main(int argc, char const *argv[])
     // //! remove data
 
     //! print result
-    cout << "name=" << name << endl;
-    cout << "expect=" << expect << endl;
-    cout << "output=" << output.str() << endl;
-    if(expect == output.str())
-        cout << "pass" << endl;
-    else
-        cout << "fail" << endl;
+    // cout << "name=" << name << endl;
+    // cout << "expect=" << expect << endl;
+    // cout << "output=" << output.str() << endl;
+    // if(expect == output.str())
+    //     cout << "pass" << endl;
+    // else
+    //     cout << "fail" << endl;
 
     return 0;
 }
