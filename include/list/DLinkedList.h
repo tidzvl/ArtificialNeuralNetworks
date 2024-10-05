@@ -176,7 +176,7 @@ public:
             if (begin)
             {
                 if (pList != 0)
-                    this->pNode = pList->head->next;
+                    this->pNode = pList->head;
                 else
                     pNode = 0;
             }
@@ -198,11 +198,14 @@ public:
         }
         void remove(void (*removeItemData)(T) = 0)
         {
-            pNode->prev->next = pNode->next;
-            pNode->next->prev = pNode->prev;
-            Node *pNext = pNode->prev; // MUST prev, so iterator++ will go to end
+            if(pNode == nullptr) return;
+            if(pNode->prev != nullptr) pNode->prev->next = pNode->next;
+            else pList->head = pNode->next;
+            if(pNode->next != nullptr) pNode->next->prev = pNode->prev;
+            else pList->tail = pNode->prev;
             if (removeItemData != 0)
                 removeItemData(pNode->data);
+            Node *pNext = pNode->prev; // MUST prev, so iterator++ will go to end
             delete pNode;
             pNode = pNext;
             pList->count -= 1;
@@ -219,7 +222,8 @@ public:
         // Prefix ++ overload
         Iterator &operator++()
         {
-            pNode = pNode->next;
+            if(pNode != nullptr) pNode = pNode->next;
+            else pNode = pList->head;
             return *this;
         }
         // Postfix ++ overload
@@ -234,13 +238,22 @@ public:
     };
 
     class BWDIterator {
+    private:
+        typename DLinkedList<T>::Node* currentNode;
+        DLinkedList<T>* pList;
     public:
         BWDIterator(DLinkedList<T>* pList, bool begin) {
             this->pList = pList;
             if (begin) {
-                currentNode = pList->tail->prev; 
+                currentNode = pList->head;
+                for(int i = 0; i < pList->size()-1; i++){
+                    currentNode = currentNode->next;
+                }
+                // currentNode = pList->tail; 
+                // cout << currentNode->data << endl;
             } else {
-                currentNode = pList->head; 
+                // currentNode = pList->tail->prev; 
+                currentNode = nullptr; 
             }
         }
 
@@ -259,7 +272,7 @@ public:
         }
 
         BWDIterator& operator--() {
-            if (currentNode != pList->head) {
+            if (currentNode != nullptr) {
                 currentNode = currentNode->prev;
             }
             return *this;
@@ -272,20 +285,29 @@ public:
         }
 
         void remove(void (*removeItemData)(T) = 0) {
-            currentNode->prev->next = currentNode->next;
-            currentNode->next->prev = currentNode->prev;
-            Node* pNext = currentNode->prev; 
-            if (removeItemData != 0) {
+            // currentNode->prev->next = currentNode->next;
+            // currentNode->next->prev = currentNode->prev;
+            // Node* pNext = currentNode->prev; 
+            // if (removeItemData != 0) {
+            //     removeItemData(currentNode->data);
+            // }
+            // delete currentNode;
+            // currentNode = pNext;
+            // pList->count -= 1;
+            if(currentNode == nullptr) return;
+            // cout << "Remove: " << currentNode->data << endl;
+            if(currentNode->prev != nullptr) currentNode->prev->next = currentNode->next;
+            else pList->head = currentNode->next;
+            if(currentNode->next != nullptr) currentNode->next->prev = currentNode->prev;
+            else pList->tail = currentNode->prev;
+            if (removeItemData != 0)
                 removeItemData(currentNode->data);
-            }
+            Node *pNext = currentNode->prev; // MUST prev, so iterator++ will go to end
             delete currentNode;
             currentNode = pNext;
             pList->count -= 1;
         }
 
-    private:
-        Node* currentNode;
-        DLinkedList<T>* pList;
     };
 
 
@@ -394,7 +416,7 @@ template <class T>
 void DLinkedList<T>::add(int index, T e)
 {
     // TODO
-    if(index < 0 || index > this->count) throw std::out_of_range("Index out of range");
+    if(index < 0 || index > this->count) throw std::out_of_range("Index is out of range!");
     Node *newNode = new Node(e);
     if(this->count == 0) {
         this->head = newNode;
@@ -404,12 +426,14 @@ void DLinkedList<T>::add(int index, T e)
         this->head->prev = newNode;
         this->head = newNode;
     }else if (index == this->count) {
-        newNode->prev = this->tail;
-        this->tail->next = newNode;
-        this->tail = newNode;
+        // newNode->prev = this->tail;
+        // this->tail->next = newNode;
+        // this->tail = newNode;
+        add(e);
+        return;
     }else{
         Node* current = this->head;
-        for(int i = 0; i < index - 1; i++){
+        for(int i = 0; i < index; i++){
             current = current->next;
         }
         newNode->next = current;
@@ -429,7 +453,7 @@ typename DLinkedList<T>::Node *DLinkedList<T>::getPreviousNodeOf(int index)
      * Efficiently navigates to the node by choosing the shorter path based on the index's position.
      */
     // TODO
-    if(index < 0 || index >= this->count) throw std::out_of_range("Index out of range");
+    if(index < 0 || index >= this->count) throw std::out_of_range("Index is out of range!");
     if(index < this->count / 2) {
         Node* current = this->head;
         for(int i = 0; i < index; i++){
@@ -450,16 +474,25 @@ template <class T>
 T DLinkedList<T>::removeAt(int index)
 {
     // TODO
-    if(index < 0 || index >= this->count) throw std::out_of_range("Index out of range");
+    if(index < 0 || index >= this->count) throw std::out_of_range("Index is out of range!");
     T current = this->head->data;
     if(index == 0) {
         this->head = this->head->next;
+        if(this->head != nullptr) this->head->prev = nullptr;
+        else this->tail = nullptr;
         this->count--;
     }else{
+        Node* current = this->head;
         for(int i = 0; i < index; i++){
-            this->head = this->head->next;
+            current = current->next;
         }
-        this->head = this->head->next;
+        if(index == this->count - 1) this->tail = current;
+        else {
+            current->prev->next = current->next;
+            if(current->next != nullptr) current->next->prev = current->prev;
+        }
+        current->next = nullptr;
+        current->prev = nullptr;
         this->count--;
     }
     return current;
@@ -494,11 +527,12 @@ template <class T>
 T &DLinkedList<T>::get(int index)
 {
     // TODO
-    if(index < 0 || index >= this->count) throw std::out_of_range("Index out of range");
+    Node* current = this->head;
+    if(index < 0 || index >= this->count) throw std::out_of_range("Index is out of range!");
     for(int i = 0; i < index; i++){
-        this->head = this->head->next;
+        current = current->next;
     }
-    return this->head->data;
+    return current->data;
 }
 
 template <class T>
@@ -523,14 +557,19 @@ template <class T>
 bool DLinkedList<T>::removeItem(T item, void (*removeItemData)(T))
 {
     // TODO
-    T current = this->head->data;
+    // T current = this->head->data;
     if(this->count == 0) return false;
-    if(this->itemEqual(current, item)) {
-        this->removeAt(0);
-        if(removeItemData != 0) removeItemData(item);
-        return true;
-    }
-    return false;
+    // if(this->itemEqual(current, item)) {
+    int index = this->indexOf(item);
+    if(index == -1) return false;
+    // if(equals(current, item, itemEqual)){
+    //     this->removeAt(0);
+    //     if(removeItemData != 0) removeItemData(item);
+    //     return true;
+    // }
+    T item2 = this->removeAt(index);
+    if(removeItemData != 0) removeItemData(item2);
+    return true;
 }
 
 template <class T>
@@ -538,9 +577,11 @@ bool DLinkedList<T>::contains(T item)
 {
     // TODO
     if(this->count == 0) return false;
-    T current = this->head->data;
+    // T current = this->head->data;
+    Node* current = this->head;
     for(int i = 0; i < this->count; i++){
-        if(this->itemEqual(current, item)) return true;
+        if(equals(current->data, item, itemEqual)) return true;
+        current = current->next;
     }
     return false;
 }

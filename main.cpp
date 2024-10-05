@@ -17,35 +17,44 @@
 using namespace std;
 
 
+void intRemove(int *p) {
+    delete p;
+}
+
 int main(int argc, char const *argv[])
 {
 
-    string name = "array35";
+    string name = "linkedList35";
     //! data
-    XArrayList<Point *> list(&XArrayList<Point *>::free, &Point::pointEQ, 0);
-    list.add(new Point(23.2f, 25.4f));
-    list.add(new Point(24.6f, 23.1f));
-    list.add(new Point(12.5f, 22.3f));
-    list.add(new Point(23.2f, 25.4f));
-    list.add(new Point(24.6f, 23.1f));
-    list.add(new Point(12.5f, 22.3f));
-    list.add(new Point(23.2f, 25.4f));
-    list.add(new Point(24.6f, 23.1f));
-    list.add(new Point(12.5f, 22.3f));
-    list.add(new Point(23.2f, 25.4f));
-    list.add(new Point(24.6f, 23.1f));
-    list.add(new Point(12.5f, 22.3f));
-
+    DLinkedList<int *> list(&DLinkedList<int *>::free);
+    list.add(new int(23));
+    list.add(new int(24));
+    list.add(new int(12));
+    cout << list.toString() << endl;
+    auto interator = list.bbegin();
+    interator.remove(&intRemove);
+    cout << "Truoc --" << list.toString() << endl;
+    interator--;
+    cout << "sau --" << list.toString() << endl;
+    interator.remove(&intRemove);
+    cout << "sau remove lan 2" << list.toString() << endl;
     //! expect
-    string expect = "[P(12.5, 22.3, 0.0)]";
+    string expect =
+        "[23]";
 
     //! output
     stringstream output;
     output << "[";
-    for (auto it : list) {
-        output << *it << ", ";
+    cout << list.toString() << endl;
+    for (auto it = list.bbegin(); it != list.bend(); --it) {
+        if (it != list.bbegin()) output << ", ";
+        output << **it;
     }
     output << "]";
+
+    //! remove data
+    list.clear();  // Clear list to avoid memory leaks
+
     cout << expect << endl;
     cout << output.str() << endl;
     // //! expect
