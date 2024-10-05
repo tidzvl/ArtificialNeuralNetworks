@@ -251,9 +251,11 @@ public:
                 }
                 // currentNode = pList->tail; 
                 // cout << currentNode->data << endl;
+                // cout << "Dang tro toi " << currentNode->data << endl;
             } else {
-                // currentNode = pList->tail->prev; 
+                // currentNode = pList->head; 
                 currentNode = nullptr; 
+                // cout << "Dang tro toi " << currentNode->data << endl;
             }
         }
 
@@ -274,13 +276,16 @@ public:
         BWDIterator& operator--() {
             if (currentNode != nullptr) {
                 currentNode = currentNode->prev;
+                // cout << "Dang tro toi " << this->currentNode->data << endl;
+            }else{
+                // cout << "CurrentNode null" << endl;
             }
             return *this;
         }
 
         BWDIterator operator--(int) {
             BWDIterator temp = *this;
-            --(*this);
+            // --(*this);
             return temp;
         }
 
@@ -300,12 +305,13 @@ public:
             else pList->head = currentNode->next;
             if(currentNode->next != nullptr) currentNode->next->prev = currentNode->prev;
             else pList->tail = currentNode->prev;
+            Node *pPrev = currentNode->prev; // MUST prev, so iterator++ will go to end
             if (removeItemData != 0)
                 removeItemData(currentNode->data);
-            Node *pNext = currentNode->prev; // MUST prev, so iterator++ will go to end
             delete currentNode;
-            currentNode = pNext;
+            currentNode = pPrev;
             pList->count -= 1;
+            // cout << "Sau remove tro toi " << currentNode->data << endl;
         }
 
     };
