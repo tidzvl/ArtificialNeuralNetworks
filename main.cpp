@@ -9,229 +9,64 @@
 // #include "include/ann/dataloader.h"
 // #include "include/ann/funtions.h"
 // #include "include/ann/xtensor_lib.h"
-#include "include/util/Point.h"
+// #include "include/util/Point.h"
 
+void dlistDemo1(){
+    List<int> dlist;
+    for(int i = 0; i< 20 ; i++)
+        dlist.add(i, i*i);
+    dlist.println();
+    for(List<int>::Iterator it=dlist.begin(); it != dlist.end(); it++ )
+        cout << *it << " ";
+    cout << endl;
+}
 
+void dlistDemo2() {
+    DLinkedList<int*> list1(&DLinkedList<int*>::free);
+    list1.add(new int(23));
+    list1.add(new int(24));
+    list1.add(new int(12));
+    // ...
 
+    for(DLinkedList<int*>::Iterator it = list1.begin(); it != list1.end(); it++)
+        cout << **it << endl;
+  
+    int* p1 = new int(24); //found in list
+    int* p2 = new int(124); //not found
+    cout << *p1 << "=> " << (list1.contains(p1)? "found; " : "not found; ")
+                << " indexOf returns: " << list1.indexOf(p1) << endl;
+    cout << *p2 << "=> " << (list1.contains(p2)? "found; " : "not found; ")
+                << " indexOf returns: " << list1.indexOf(p2) << endl;
 
-using namespace std;
+    delete p1; delete p2;
+}
 
+bool intComparator(int*& p1, int*& p2) {
+    return *p1 == *p2;
+}
 
-void intRemove(int *p) {
+string LintPtr2Str(int*& ptr) {
+    stringstream os;
+    os << *ptr;
+    return os.str();
+}
+
+void dlistDemo4() {
+    DLinkedList<int*> dList(&DLinkedList<int*>::free, &intComparator);
+    dList.add(new int(1));
+    dList.add(new int(2));
+    dList.add(new int(1));
+    dList.println(&LintPtr2Str);
+
+    cout << "test for indexOf: " << endl;
+    int* p = new int(1);
+    cout << *p << " at: " << dList.indexOf(p) << endl;
     delete p;
 }
 
-int main(int argc, char const *argv[])
-{
-
-    string name = "linkedList35";
-    //! data
-    DLinkedList<int *> list(&DLinkedList<int *>::free);
-    list.add(new int(23));
-    list.add(new int(24));
-    list.add(new int(12));
-    cout << list.toString() << endl;
-    auto interator = list.bbegin();
-    interator.remove(&intRemove);
-    cout << "Truoc --" << list.toString() << endl;
-    interator--;
-    cout << "sau --" << list.toString() << endl;
-    interator.remove(&intRemove);
-    cout << "sau remove lan 2" << list.toString() << endl;
-    //! expect
-    string expect =
-        "[23]";
-
-    //! output
-    stringstream output;
-    output << "[";
-    cout << list.toString() << endl;
-    for (auto it = list.bbegin(); it != list.bend(); --it) {
-        if (it != list.bbegin()) output << ", ";
-        output << **it;
-    }
-    output << "]";
-
-    //! remove data
-    list.clear();  // Clear list to avoid memory leaks
-
-    cout << expect << endl;
-    cout << output.str() << endl;
-    // //! expect
-    // string expect = "[0]\nsize=1\nempty=0";
-
-    // //! output
-    // string output = list.toString() + "\nsize=" + to_string(list.size()) +
-    //                 "\nempty=" + to_string(list.empty());
-    
-    // cout << expect << endl;
-    // cout << output << endl;
-    // DLinkedList<string>::Iterator it = list.bbegin();
-    // --it;
-
-    // xt::xarray<float> data = {{1., 2.}, {3., 4.}, {5., 6.}};
-    // xt::xarray<string> label = {"one", "two", "three"};
-
-    // TensorDataset<float, string> dataset(data, label);
-    // int len = dataset.len();
-    // cout << len << endl;
-    // for(int i = 0; i < len; ++i){
-    //     DataLabel<float, string> item = dataset.getitem(i);
-    //     cout << "Data: ";
-    //     for(const auto& value : item.getData()){
-    //         cout << value << " ";
-    //     }
-    //     cout << "Label: ";
-    //     for(const auto& value : item.getLabel()){
-    //         cout << value << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // for(const auto& dim : dataset.get_data_shape()){
-    //     cout << dim << " ";
-    // }
-    // cout << endl;
-    // for(const auto& dim : dataset.get_label_shape()){
-    //     cout << dim << " ";
-    // }
-
-    // xt::xarray<float> empty;
-    // auto shape = empty.shape();
-    // bool is_empty = any_of(shape.begin(), shape.end(), [](auto size) { return size != 0; });
-    // if (!is_empty) {
-    //     std::cout << "" << std::endl;
-    // }
-
-
-
-    // test dataloader
-    // int nsamples = 100;
-    // xt::xarray<double> X = xt::random::randn<double>({nsamples, 10});
-    // xt::xarray<double> T = xt::random::randn<double>({nsamples, 5});
-    // TensorDataset<double, double> ds(X, T);
-    // DataLoader<double, double> loader(&ds, 30, true, false);
-    // for(auto batch : loader){
-    //     cout << shape2str(batch.getData().shape()) << endl;
-    //     cout << shape2str(batch.getLabel().shape()) << endl;
-    // }
-
-    // string name = "data20";
-    // //! data
-    // int nsamples = 120;
-    // xt::xarray<double> X = xt::random::randn<double>({nsamples, 10, 5});
-    // xt::xarray<double> T = xt::random::randn<double>({nsamples, 5, 5});
-    // TensorDataset<double, double> ds(X, T);
-    // DataLoader<double, double> loader(&ds, 30, true, true);
-    // //! expect
-    // string expect =
-    //     "(30, 10, 5);(30, 5, 5) (30, 10, 5);(30, 5, 5) (30, 10, 5);(30, 5, 5) "
-    //     "(30, 10, 5);(30, 5, 5) ";
-
-    // ! output
-
-    // stringstream output;
-    // xt::svector<unsigned long>a;
-    // xt::svector<unsigned long>b;
-    // for (auto batch : loader) {
-    //     // output << shape2str(xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end())) << ";";
-    //     // output << shape2str(xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end())) << " ";
-    //     // cout << xt::adapt(batch.getData().shape()) << ";";
-    //     a = xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end());
-    //     cout << "(";
-    //     for(int idx=0; idx < a.size(); idx++){
-    //         cout << a[idx];
-    //         if(idx != a.size() - 1) cout << ", ";
-    //     }
-    //     cout << ");";
-    //     b = xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end());
-    //     cout << "(";
-    //     for(int idx=0; idx < b.size(); idx++){
-    //         cout << b[idx];
-    //         if(idx != b.size() - 1) cout << ", ";
-    //     }
-    //     cout << ") ";
-    // }
-
-//     string name = "data26";
-//   //! data
-//   xt::xarray<float> data = {1., 2., 3.};
-//   xt::xarray<string> label;
- 
-//   TensorDataset<float, string> tensor(data, label);
-  
-//   DataLabel<float, string> getitem = tensor.getitem(0);
-
-//   xt::xarray<float> getData = getitem.getData();
-//   xt::xarray<string> getLabel = getitem.getLabel();
-
-//   //! expect
-//   string expect = " 1.;";
-
-//   //! output
-//   stringstream output;
-//   output << getData << ";";
-//   output << getLabel;
-
-  //! output
-
-    // stringstream output;
-    // xt::svector<unsigned long>a;
-    // xt::svector<unsigned long>b;
-    // for (auto batch : loader) {
-    //     // output << shape2str(xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end())) << ";";
-    //     // output << shape2str(xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end())) << " ";
-    //     a = xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end());
-    //     output << "(";
-    //     for(int idx=0; idx < a.size(); idx++){
-    //         output << a[idx];
-    //         if(idx != a.size() - 1) output << ", ";
-    //     }
-    //     output << ");";
-    //     b = xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end());
-    //     output << "(";
-    //     for(int idx=0; idx < b.size(); idx++){
-    //         output << b[idx];
-    //         if(idx != b.size() - 1) output << ", ";
-    //     }
-    //     output << ") ";
-    // }
-    // auto batch = loader.begin();
-    // Batch<double, double> c = *(batch);
-    // stringstream output;
-    // xt::svector<unsigned long>a;
-    // xt::svector<unsigned long>b;
-    // for (auto batch : loader) {
-    //     // output << shape2str(xt::svector<unsigned long>(batch.getData().shape().begin(), batch.getData().shape().end())) << ";";
-    //     // output << shape2str(xt::svector<unsigned long>(batch.getLabel().shape().begin(), batch.getLabel().shape().end())) << " ";
-    //     a = xt::svector<unsigned long>(c.getData().shape().begin(), c.getData().shape().end());
-    //     output << "(";
-    //     for(int idx=0; idx < a.size(); idx++){
-    //         output << a[idx];
-    //         if(idx != a.size() - 1) output << ", ";
-    //     }
-    //     output << ") ";
-    //     b = xt::svector<unsigned long>(c.getLabel().shape().begin(), c.getLabel().shape().end());
-    //     output << "(";
-    //     for(int idx=0; idx < b.size(); idx++){
-    //         output << b[idx];
-    //         if(idx != b.size() - 1) output << ", ";
-    //     }
-    //     output << ")";
-    // }
-
-
-
-
-    // //! remove data
-
-    //! print result
-    // cout << "name=" << name << endl;
-    // cout << "expect=" << expect << endl;
-    // cout << "output=" << output.str() << endl;
-    // if(expect == output.str())
-    //     cout << "pass" << endl;
-    // else
-    //     cout << "fail" << endl;
-
+int main() {
+    dlistDemo1();
+    dlistDemo2();
+    // dlistDemo4();
     return 0;
 }

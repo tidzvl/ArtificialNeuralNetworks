@@ -176,14 +176,18 @@ public:
             if (begin)
             {
                 if (pList != 0)
+                {
                     this->pNode = pList->head;
+                }
                 else
                     pNode = 0;
             }
             else
             {
-                if (pList != 0)
-                    this->pNode = pList->tail;
+                if (pList != 0){
+                    if(pList->tail == nullptr) this->pNode = pList->tail;
+                    else this->pNode = pList->tail->prev;
+                }
                 else
                     pNode = 0;
             }
