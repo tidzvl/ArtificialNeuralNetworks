@@ -27,26 +27,28 @@ private:
     bool shuffle;
     bool drop_last;
     vector<int> ind;
+    int m_seed;
     /*TODO: add more member variables to support the iteration*/
 public:
     DataLoader(Dataset<DType, LType>* ptr_dataset,
             int batch_size,
             bool shuffle=true,
-            bool drop_last=false){
+            bool drop_last=false,
+            int seed = -1){
         /*TODO: Add your code to do the initialization */
         this->ptr_dataset = ptr_dataset;
         this->batch_size = batch_size;
         this->shuffle = shuffle;
         this->drop_last = drop_last;
-        if(this->batch_size > ptr_dataset->len() && drop_last == false){
-            this->batch_size = ptr_dataset->len();
-        }
-
+        // if(this->batch_size > ptr_dataset->len() && drop_last == false){
+        //     this->batch_size = ptr_dataset->len();
+        // }
+        this->m_seed = seed;
         ind.resize(ptr_dataset->len());
         iota(ind.begin(), ind.end(), 0);
 
         if(shuffle){
-            shuff();
+            shuff(seed);
         }
 
     }
@@ -56,9 +58,9 @@ public:
     // The section for supporting the iteration and for-each to DataLoader //
     /// START: Section                                                     //
     /////////////////////////////////////////////////////////////////////////
-    void shuff(){
+    void shuff(int seed){
         xt::xarray<int> index = xt::adapt(ind);
-        xt::random::seed(0);
+        xt::random::seed(seed);
         xt::random::shuffle(index);
         ind.assign(index.data(), index.data() + index.size());
     }
@@ -162,8 +164,12 @@ public:
                 if(current_index + batch_cuoi > current_index + loader.batch_size
                 && current_index + batch_cuoi >= loader.ptr_dataset->len()){
                     is_batch_end = true;
-                    data_shape[0] = batch_cuoi;
-                    label_shape[0] = batch_cuoi;
+                    if(sizeD != 0){
+                        data_shape[0] = batch_cuoi;
+                    }
+                    if(sizeL != 0){
+                        label_shape[0] = batch_cuoi;
+                    }
                 }
             }
 

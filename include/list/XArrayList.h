@@ -237,14 +237,29 @@ template <class T>
 XArrayList<T> &XArrayList<T>::operator=(const XArrayList<T> &list)
 {
     // TODO
-    this->capacity = list.capacity;
-    this->count = list.count;
-    this->deleteUserData = list.deleteUserData;
-    this->itemEqual = list.itemEqual;
-    this->count = list.count;
-    for(int i = 0; i < list->count; i++){
-        this->data[i] = list->data[i];
+    // this->capacity = list.capacity;
+    // this->count = list.count;
+    // this->deleteUserData = list.deleteUserData;
+    // this->itemEqual = list.itemEqual;
+    // this->count = list.count;
+    // delete[] this->data;
+    // this->data = new T[list.count];
+    // for(int i = 0; i < list.count; i++){
+    //     this->data[i] = list.data[i];
+    // }
+    // return *this;
+    if (this != &list) {
+        delete[] this->data;
+        this->capacity = list.capacity;
+        this->count = list.count;
+        this->deleteUserData = list.deleteUserData;
+        this->itemEqual = list.itemEqual;
+        this->data = new T[list.count];
+        for(int i = 0; i < list.count; i++){
+            this->data[i] = list.data[i];
+        }
     }
+    return *this;
 }
 
 template <class T>
