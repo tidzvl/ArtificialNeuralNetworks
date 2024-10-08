@@ -47,7 +47,7 @@ public:
         ind.resize(ptr_dataset->len());
         iota(ind.begin(), ind.end(), 0);
 
-        if(shuffle){
+        if(shuffle && seed >= 0){
             shuff(seed);
         }
 
